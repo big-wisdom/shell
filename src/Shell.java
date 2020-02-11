@@ -13,16 +13,24 @@ class Shell {
         while(true){
             String[] userInput = splitCommand(prompt());
 
-            if(userInput[0] == "exit") break; // If quit then quit
+            if(userInput[0].equals("exit")) break; // If quit then quit
 
-            runExternalCommand(userInput); // Try to execute external command
-
-            // try to run built in command
-            // Execute command
-            // End timer and add time to CPU time
-
-            // If the command is invalid
+            if(!runExternalCommand(userInput)) { // Try to execute external command
+                // try to run built in command
+                switch (userInput[0]) {
+                    case "list":
+                        list();
+                        break;
+                    default:
+                        System.out.println("Command Not Found!");
+                }
+                // End timer and add time to CPU time
+            }
         }
+    }
+
+    private static void list(){
+        System.out.println("List command running");
     }
 
     private static String prompt(){
@@ -30,7 +38,7 @@ class Shell {
         return scanner.nextLine();
     }
 
-    private static void runExternalCommand(String[] args) {
+    private static Boolean runExternalCommand(String[] args) {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(args[0]);
             String s;
@@ -49,9 +57,10 @@ class Shell {
             // Print output
             while ((s = br.readLine()) != null)
                 System.out.println(s);
+            return true;
 
         } catch(IOException | InterruptedException e) {
-            e.printStackTrace();
+            return false;
         }
     }
 
