@@ -1,6 +1,9 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,7 +33,24 @@ class Shell {
     }
 
     private static void list(){
-        System.out.println("List command running");
+        File folder = new File(workingDirectory);
+        for(File file : folder.listFiles()){
+            // Print Permissions
+            String directory = file.isDirectory() ? "d" : "-";
+            String read = file.canRead() ? "r" : "-";
+            String write = file.canWrite() ? "w" : "-";
+            String execute = file.canExecute() ? "x" : "-";
+            System.out.print(directory+ read+ write+ execute+"  ");
+
+            // Print size
+            System.out.printf("%10d ",file.length());
+
+            // print last modified date
+            System.out.print(new Date(file.lastModified())+"  ");
+
+            // Print title of the file
+            System.out.println(file.getName());
+        }
     }
 
     private static String prompt(){
