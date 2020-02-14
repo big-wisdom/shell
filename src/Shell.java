@@ -2,14 +2,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class Shell {
-    private static String workingDirectory = System.getProperty("user.dir");
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -24,6 +22,9 @@ class Shell {
                     case "list":
                         list();
                         break;
+                    case "cd":
+                        changeDirectory();
+                        break;
                     default:
                         System.out.println("Command Not Found!");
                 }
@@ -32,8 +33,12 @@ class Shell {
         }
     }
 
+    private static void changeDirectory(){
+        System.setProperty("user.dir",System.getProperty("user.home"));
+    }
+
     private static void list(){
-        File folder = new File(workingDirectory);
+        File folder = new File(System.getProperty("user.dir"));
         for(File file : folder.listFiles()){
             // Print Permissions
             String directory = file.isDirectory() ? "d" : "-";
@@ -54,13 +59,18 @@ class Shell {
     }
 
     private static String prompt(){
-        System.out.print("["+workingDirectory+"]: ");
+        System.out.print("["+System.getProperty("user.dir")+"]: ");
         return scanner.nextLine();
     }
 
     private static Boolean runExternalCommand(String[] args) {
+        // TODO: REMOVE THIS SECION
+        if (args[0].equals("cd")) return false;
+        // TODO: ITS ONLY FOR TESTING ON MAC
+
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(args[0]);
+            processBuilder.directory(new File(System.getProperty("user.dir")));
             String s;
             BufferedReader br;
 
