@@ -23,7 +23,7 @@ class Shell {
                         list();
                         break;
                     case "cd":
-                        changeDirectory();
+                        changeDirectory(userInput);
                         break;
                     default:
                         System.out.println("Command Not Found!");
@@ -33,8 +33,30 @@ class Shell {
         }
     }
 
-    private static void changeDirectory(){
-        System.setProperty("user.dir",System.getProperty("user.home"));
+    private static void changeDirectory(String[] userInput){
+        // If no arguments
+        String directory;
+        if(userInput.length <= 1) System.setProperty("user.dir",System.getProperty("user.home"));
+        else {
+            File f = new File(userInput[1]);
+            // if .. given, go to parent directory
+            if(userInput[1].equals("..")) {
+                int chop = System.getProperty("user.dir").lastIndexOf("/");
+                System.setProperty("user.dir", System.getProperty("user.dir").substring(0, chop));
+            } else {
+                if(f.isAbsolute()) directory = userInput[1]; // make absolute
+                else directory = System.getProperty("user.dir")+"/"+userInput[1];
+                f = new File(directory);
+                // Check for existence
+                if (f.exists()) {
+                    // check if directory
+                    if (f.isDirectory()){
+                        System.setProperty("user.dir",directory);
+                    } else System.out.println(directory+" is not a directory.");
+                }
+                else System.out.println("directory, "+directory+", does not exist.");
+            }
+        }
     }
 
     private static void list(){
