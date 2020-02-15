@@ -29,11 +29,39 @@ class Shell {
                     case "ptime":
                         System.out.println("Total time in child processes: "+timeWaiting+" seconds");
                         break;
+                    case "mdir":
+                        mdir(userInput);
+                        break;
+                    case "rdir":
+                        rdir(userInput);
+                        break;
                     default:
                         System.out.println("Command Not Found!");
                 }
                 // End timer and add time to CPU time
             }
+        }
+    }
+
+    private static void rdir(String[] userInput){
+        if(userInput.length > 1){
+            File file = new File(System.getProperty("user.dir")+ "/"+userInput[1]);
+            if(file.exists()) file.delete();
+            else System.out.println("directory does not exist");
+        } else {
+            System.out.println("Usage: rdir <directory name>");
+        }
+    }
+
+    private static void mdir(String[] userInput){
+        if(userInput.length > 1) {
+            String path = System.getProperty("user.dir") + "/" + userInput[1];
+            File folder = new File(path);
+            if (!folder.mkdir()) {
+                System.out.println("Unsuccessful, \"" + path + "\" already exists.");
+            }
+        } else {
+            System.out.println("Usage: mdir <directory name>");
         }
     }
 
