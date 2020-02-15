@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 class Shell {
     private static Scanner scanner = new Scanner(System.in);
+    private static double timeWaiting = 0;
 
     public static void main(String[] args) {
         while(true){
@@ -24,6 +25,9 @@ class Shell {
                         break;
                     case "cd":
                         changeDirectory(userInput);
+                        break;
+                    case "ptime":
+                        System.out.println("Total time in child processes: "+timeWaiting+" seconds");
                         break;
                     default:
                         System.out.println("Command Not Found!");
@@ -86,17 +90,15 @@ class Shell {
     }
 
     private static Boolean runExternalCommand(String[] args) {
-        // TODO: REMOVE THIS SECION
         if (args[0].equals("cd")) return false;
-        // TODO: ITS ONLY FOR TESTING ON MAC
-
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder(args[0]);
+            ProcessBuilder processBuilder = new ProcessBuilder(args);
             processBuilder.directory(new File(System.getProperty("user.dir")));
             String s;
             BufferedReader br;
 
             // Start timer
+            double start = java.lang.System.currentTimeMillis();
             // Start Process
             Process process = processBuilder.start();
             process.waitFor();
@@ -109,6 +111,10 @@ class Shell {
             // Print output
             while ((s = br.readLine()) != null)
                 System.out.println(s);
+
+            double end = java.lang.System.currentTimeMillis();
+            timeWaiting += (end - start);
+
             return true;
 
         } catch(IOException | InterruptedException e) {
