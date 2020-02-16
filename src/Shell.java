@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -14,32 +15,74 @@ class Shell {
     public static void main(String[] args) {
         while(true){
             String[] userInput = splitCommand(prompt());
-
             if(userInput[0].equals("exit")) break; // If quit then quit
-
-            if(!runExternalCommand(userInput)) { // Try to execute external command
-                // try to run built in command
-                switch (userInput[0]) {
-                    case "list":
-                        list();
-                        break;
-                    case "cd":
-                        changeDirectory(userInput);
-                        break;
-                    case "ptime":
-                        System.out.println("Total time in child processes: "+timeWaiting+" seconds");
-                        break;
-                    case "mdir":
-                        mdir(userInput);
-                        break;
-                    case "rdir":
-                        rdir(userInput);
-                        break;
-                    default:
-                        System.out.println("Command Not Found!");
+            // Check for piped command
+            Boolean pipe = false;
+            for(int x=0; x<userInput.length; x++)
+                if(userInput[x].equals("|")) {
+                    pipe = true;
+                    pipeCommands(Arrays.copyOfRange(userInput, 0, x), Arrays.copyOfRange(userInput, x + 1, userInput.length));
                 }
-                // End timer and add time to CPU time
+
+            if(!pipe) {
+                if (!runExternalCommand(userInput)) { // Try to execute external command
+                    // try to run built in command
+                    switch (userInput[0]) {
+                        case "list":
+                            list();
+                            break;
+                        case "cd":
+                            changeDirectory(userInput);
+                            break;
+                        case "ptime":
+                            System.out.println("Total time in child processes: " + timeWaiting + " seconds");
+                            break;
+                        case "mdir":
+                            mdir(userInput);
+                            break;
+                        case "rdir":
+                            rdir(userInput);
+                            break;
+                        default:
+                            System.out.println("Command Not Found!");
+                    }
+                    // End timer and add time to CPU time
+                }
             }
+        }
+    }
+
+    private static void pipeCommands(String[] p1Cmd, String[] p2Cmd){
+        ProcessBuilder pb1 = new ProcessBuilder(p1Cmd);
+        ProcessBuilder pb2 = new ProcessBuilder(p2Cmd);
+        pb1.directory(new File(System.getProperty("user.dir")));
+        pb2.directory(new File(System.getProperty("user.dir")));
+
+        pb1.redirectInput(ProcessBuilder.Redirect.INHERIT);
+        //pb1.redirectOutput(ProcessBuilder.Redirect.PIPE);
+
+        pb2.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+
+        try {
+            Process p1 = pb1.start();
+            Process p2 = pb2.start();
+
+            java.io.InputStream in = p1.getInputStream();
+            java.io.OutputStream out = p2.getOutputStream();
+
+            int c;
+            while ((c = in.read()) != -1) {
+                out.write(c);
+            }
+
+            out.flush();
+            out.close();
+
+            p1.waitFor();
+            p2.waitFor();
+            //TODO: Get standard error from commands
+        }
+        catch (Exception ex) {
         }
     }
 
@@ -150,7 +193,7 @@ class Shell {
         }
     }
 
-    public static String[] splitCommand(String command) {
+    private static String[] splitCommand(String command) {
         java.util.List<String> matchList = new java.util.ArrayList<>();
 
         Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
