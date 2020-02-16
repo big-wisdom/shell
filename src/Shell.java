@@ -8,11 +8,13 @@ class Shell {
 
     public static void main(String[] args) {
         CommandFactory commandFactory = new CommandFactory();
-        while(true){
-            String userInput = prompt();
-            if(userInput.startsWith("exit")) break;
+        String userInput;
+
+        // main loop
+        while( !(userInput=prompt()).startsWith("exit") ){
             commandFactory.getCommands(userInput);
         }
+
     }
 
 

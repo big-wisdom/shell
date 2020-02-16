@@ -8,19 +8,11 @@ class CommandFactory{
     public void getCommands(String userInput) {
         String[] input = splitCommand(userInput);
         // Generate an arraylist of command string arrays
-        ArrayList<String[]> commandArrays = new ArrayList<>();
-        Boolean piped = false;
-        for(int x=0; x<input.length; x++)
-            if(input[x].equals("|")) {
-                commandArrays.add(Arrays.copyOfRange(input, 0, x));
-                commandArrays.add(Arrays.copyOfRange(input, x + 1, input.length));
-                piped = true;
-            }
-        if(!piped) commandArrays.add(input);
+        ArrayList<String[]> commandStrings = seperateCommands(input);
 
         // create default external command object unless build in command recognized
         ArrayList<Command> commands = new ArrayList<>();
-        for(String[] commandString: commandArrays){
+        for(String[] commandString: commandStrings){
             switch (commandString[0]){
                 case "list":
                     System.out.println("list");
@@ -49,6 +41,19 @@ class CommandFactory{
         }
     }
 
+    private ArrayList<String[]> seperateCommands(String[] input){
+        ArrayList<String[]> commandArrays = new ArrayList<>();
+        Boolean piped = false;
+        for(int x=0; x<input.length; x++)
+            if(input[x].equals("|")) {
+                commandArrays.add(Arrays.copyOfRange(input, 0, x));
+                commandArrays.add(Arrays.copyOfRange(input, x + 1, input.length));
+                piped = true;
+            }
+        if(!piped) commandArrays.add(input);
+        return commandArrays;
+    }
+
     private static String[] splitCommand(String command) {
         java.util.List<String> matchList = new java.util.ArrayList<>();
 
@@ -66,7 +71,6 @@ class CommandFactory{
                 matchList.add(regexMatcher.group());
             }
         }
-
         return matchList.toArray(new String[matchList.size()]);
     }
 }
