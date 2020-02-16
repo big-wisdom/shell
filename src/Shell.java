@@ -1,60 +1,20 @@
 import java.io.*;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 class Shell {
     private static Scanner scanner = new Scanner(System.in);
     private static double timeWaiting = 0;
 
     public static void main(String[] args) {
+        CommandFactory commandFactory = new CommandFactory();
         while(true){
-            String command = prompt();
-            String[] userInput = splitCommand(command);
-            if(userInput[0].equals("exit")) break; // If quit then quit
-            Boolean log = true;
-            // Check for piped command
-            Boolean pipe = false;
-            for(int x=0; x<userInput.length; x++)
-                if(userInput[x].equals("|")) {
-                    pipe = true;
-                    pipeCommands(Arrays.copyOfRange(userInput, 0, x), Arrays.copyOfRange(userInput, x + 1, userInput.length));
-                }
-
-            if(!pipe) {
-                if (!runExternalCommand(userInput)) { // Try to execute external command
-                    // try to run built in command
-                    switch (userInput[0]) {
-                        case "list":
-                            list();
-                            break;
-                        case "cd":
-                            changeDirectory(userInput);
-                            break;
-                        case "ptime":
-                            System.out.println("Total time in child processes: " + timeWaiting + " seconds");
-                            break;
-                        case "mdir":
-                            mdir(userInput);
-                            break;
-                        case "rdir":
-                            rdir(userInput);
-                            break;
-                        case "history":
-                            history();
-                            break;
-                        default:
-                            System.out.println("Command Not Found!");
-                            log = false;
-                    }
-                    // End timer and add time to CPU time
-                }
-            }
-            logCommand(command);
+            String userInput = prompt();
+            if(userInput.startsWith("exit")) break;
+            commandFactory.getCommands(userInput);
         }
     }
+
 
     private static void history() {
         try {
@@ -218,24 +178,4 @@ class Shell {
         }
     }
 
-    private static String[] splitCommand(String command) {
-        java.util.List<String> matchList = new java.util.ArrayList<>();
-
-        Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
-        Matcher regexMatcher = regex.matcher(command);
-        while (regexMatcher.find()) {
-            if (regexMatcher.group(1) != null) {
-                // Add double-quoted string without the quotes
-                matchList.add(regexMatcher.group(1));
-            } else if (regexMatcher.group(2) != null) {
-                // Add single-quoted string without the quotes
-                matchList.add(regexMatcher.group(2));
-            } else {
-                // Add unquoted word
-                matchList.add(regexMatcher.group());
-            }
-        }
-
-        return matchList.toArray(new String[matchList.size()]);
-    }
 }
