@@ -5,10 +5,17 @@ import java.io.InputStreamReader;
 
 class Command{
     String[] command;
-    double timeWaiting;
+    String commandString;
+    static double timeWaiting = 0;
 
-    Command(String[] commandInput){
-        command = commandInput;
+    Command(){}
+
+    Command(String[] userInput){
+        command = userInput;
+        StringBuilder stringBuilder = new StringBuilder();
+        for(String piece: userInput)
+            stringBuilder.append(piece);
+        commandString = stringBuilder.toString();
     }
 
     public Boolean run(){

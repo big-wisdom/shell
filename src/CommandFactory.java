@@ -4,8 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class CommandFactory{
-
-    public void getCommands(String userInput) {
+    public Command[] getCommands(String userInput) {
         String[] input = splitCommand(userInput);
         // Generate an arraylist of command string arrays
         ArrayList<String[]> commandStrings = seperateCommands(input);
@@ -15,30 +14,31 @@ class CommandFactory{
         for(String[] commandString: commandStrings){
             switch (commandString[0]){
                 case "list":
-                    System.out.println("list");
+                    commands.add(new list(commandString));
                     break;
                 case "cd":
-                    System.out.println("cd");
+                    commands.add(new changeDirectory(commandString));
                     break;
                 case "ptime":
-                    System.out.println("ptime");
+                    System.out.println(Command.timeWaiting/1000);
                     break;
                 case "mdir":
-                    System.out.println("mdir");
+                    commands.add(new mdir(commandString));
                     break;
                 case "rdir":
-                    System.out.println("rdir");
+                    commands.add(new rdir(commandString));
                     break;
                 case "history":
-                    System.out.println("history");
+                    commands.add(new history(commandString));
                     break;
                 case "^":
                     System.out.println("^");
                     break;
                 default:
-                    System.out.println("Command Not Found!");
+                    commands.add(new Command(commandString));
             }
         }
+        return commands.toArray(new Command[commands.size()]);
     }
 
     private ArrayList<String[]> seperateCommands(String[] input){
