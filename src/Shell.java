@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Scanner;
@@ -14,8 +11,10 @@ class Shell {
 
     public static void main(String[] args) {
         while(true){
-            String[] userInput = splitCommand(prompt());
+            String command = prompt();
+            String[] userInput = splitCommand(command);
             if(userInput[0].equals("exit")) break; // If quit then quit
+            Boolean log = true;
             // Check for piped command
             Boolean pipe = false;
             for(int x=0; x<userInput.length; x++)
@@ -43,12 +42,38 @@ class Shell {
                         case "rdir":
                             rdir(userInput);
                             break;
+                        case "history":
+                            history();
+                            break;
                         default:
                             System.out.println("Command Not Found!");
+                            log = false;
                     }
                     // End timer and add time to CPU time
                 }
             }
+            logCommand(command);
+        }
+    }
+
+    private static void history() {
+        try {
+            FileReader fileReader = new FileReader("History.txt");
+            int i;
+            while((i = fileReader.read()) != -1) System.out.print((char) i);
+            fileReader.close();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    private static void logCommand(String command) {
+        try {
+            FileWriter myWriter = new FileWriter("History.txt", true);
+            myWriter.write(command+"\n");
+            myWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
