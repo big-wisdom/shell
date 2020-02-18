@@ -30,7 +30,8 @@ class Command{
             double start = System.currentTimeMillis();
             // Start Process
             Process process = processBuilder.start();
-            process.waitFor();
+            if(!command[command.length-1].equals("&")) process.waitFor();
+
             // Check exit value
             if(process.exitValue() != 0) {
                 br = new BufferedReader(new InputStreamReader(process.getErrorStream()));

@@ -23,6 +23,7 @@ class Shell {
             }
             // log commands if successful
             if(log) logCommand(userInput);
+            else System.out.println("Invalid: Command not found.");
         }
 
     }

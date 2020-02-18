@@ -9,7 +9,7 @@ public class ptime extends Command{
 
     @Override
     public Boolean run(){
-        System.out.println("Time spend in child processes "+(Command.timeWaiting/1000)+" seconds");
+        System.out.printf("Time spend in child processes %.4f seconds\n",Command.timeWaiting/1000);
         return true;
     }
 }
