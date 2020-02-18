@@ -1,10 +1,12 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class CommandFactory{
-    public Command[] getCommands(String userInput) {
+    public Command[] getCommands(String userInput, int depthSoFar) {
         String[] input = splitCommand(userInput);
         // Generate an arraylist of command string arrays
         ArrayList<String[]> commandStrings = seperateCommands(input);
@@ -20,7 +22,7 @@ class CommandFactory{
                     commands.add(new changeDirectory(commandString));
                     break;
                 case "ptime":
-                    System.out.println(Command.timeWaiting/1000);
+                    commands.add(new ptime(commandString));
                     break;
                 case "mdir":
                     commands.add(new mdir(commandString));
@@ -32,8 +34,9 @@ class CommandFactory{
                     commands.add(new history(commandString));
                     break;
                 case "^":
-                    System.out.println("^");
-                    break;
+                    Command[] com = getCommands(getOldCommand(Integer.parseInt(commandString[1])+depthSoFar), depthSoFar+Integer.parseInt(commandString[1]));
+                    return com;
+
                 default:
                     commands.add(new Command(commandString));
             }
@@ -72,5 +75,18 @@ class CommandFactory{
             }
         }
         return matchList.toArray(new String[matchList.size()]);
+    }
+
+    private String getOldCommand(int x){
+        try {
+            ArrayList<String> commands = new ArrayList<>();
+            Scanner scanner = new Scanner(new File("History.txt"));
+            while(scanner.hasNext()) commands.add(0, scanner.nextLine());
+            System.out.println("first command: "+commands.get(x-1));
+            return commands.get(x-1);
+        } catch (Exception e) {
+            System.out.println("Could not access history");
+            return null;
+        }
     }
 }
