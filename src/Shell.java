@@ -15,8 +15,8 @@ class Shell {
             Boolean log = false;
             // if multiple commands, pipe them together currently only supports two commands piped
             if (commands.length > 1) {
-                // TODO: pipe
-                System.out.println("Pipe commands here");
+                pipeCommands(commands[0], commands[1]);
+                log = true;
             } else if(commands.length == 1){
                 // otherwise just run it
                 log = commands[0].run();
@@ -37,9 +37,9 @@ class Shell {
         }
     }
 
-    private static void pipeCommands(String[] p1Cmd, String[] p2Cmd) {
-        ProcessBuilder pb1 = new ProcessBuilder(p1Cmd);
-        ProcessBuilder pb2 = new ProcessBuilder(p2Cmd);
+    private static void pipeCommands(Command p1Cmd, Command p2Cmd) {
+        ProcessBuilder pb1 = new ProcessBuilder(p1Cmd.command);
+        ProcessBuilder pb2 = new ProcessBuilder(p2Cmd.command);
         pb1.directory(new File(System.getProperty("user.dir")));
         pb2.directory(new File(System.getProperty("user.dir")));
 
